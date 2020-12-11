@@ -3,6 +3,8 @@ package main
 import (
     "os"
     "log"
+    "./container"
+    "fmt"
 )
 
 const usage = "simple implementation by Yufeng Yang!"
@@ -28,18 +30,18 @@ func main() {
         Run(true, os.Args[3])
 
     case "init":
-        err := container.RunContainerInitProcess(cmd, nil)
+        err := container.RunContainerInitProcess(os.Args[2], nil)
         if err != nil {
             log.Fatal("Error in Init Function")
-            Printf("Error in Init Function\n")
+            fmt.Printf("Error in Init Function\n")
         }
 		
     case "--usage":
-        Printf("Usage: %s", usage)
+        fmt.Printf("Usage: %s", usage)
 
     default:
         log.Fatal("Wrong arguments")
-        Printf("Wrong arguments\nUsage: %s\n", usage)
+        fmt.Printf("Wrong arguments\nUsage: %s\n", usage)
     }
 
 }
