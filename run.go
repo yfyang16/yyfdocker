@@ -17,7 +17,7 @@ func Run(tty bool, command string) {
 
     parent := container.NewParentProcess(tty, command)
     if err := parent.Start(); err != nil {
-        log.Printf(err)
+        log.Panicln(err)
     }
     parent.Wait()
 
