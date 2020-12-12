@@ -34,6 +34,8 @@ func RunContainerInitProcess(command string, args []string) error {
 	syscall.Mount("proc", "/proc", "proc", uintptr(defaultMountFlags), "")
 	argv := []string{command}
 
+	log.Printf("** RunContainerInitProcess END **\n")
+
 	// syscall.Exec will execute "command" and replace the init process with
 	// "command" process. (So the first process (pid == 1) will be "command")
 	err = syscall.Exec(command, argv, os.Environ())
@@ -41,6 +43,6 @@ func RunContainerInitProcess(command string, args []string) error {
 		log.Printf(err.Error())
 	}
 
-	log.Printf("** RunContainerInitProcess END **\n")
+	log.Printf("** RunContainerInitProcess ERROR END **\n")
 	return err
 }
