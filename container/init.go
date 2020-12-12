@@ -36,7 +36,7 @@ func RunContainerInitProcess(command string, args []string) error {
 
 	// syscall.Exec will execute "command" and replace the init process with
 	// "command" process. (So the first process (pid == 1) will be "command")
-	err := syscall.Exec(command, argv, os.Environ())
+	err = syscall.Exec(command, argv, os.Environ())
 	if err != nil {
 		log.Printf(err.Error())
 	}
