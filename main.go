@@ -37,10 +37,10 @@ func main() {
         for argIdx < len(os.Args)  {
             arg := os.Args[argIdx]
             switch arg {
-                case "-m":        allCfg.MemoryLimit = os.Args[3 + argIdx]; argIdx += 2
-                case "-cpushare": allCfg.CpuShare = os.Args[3 + argIdx]; argIdx += 2
-                case "-cpuset":   allCfg.CpuSet = os.Args[3 + argIdx]; argIdx += 2
-                case "-tty":      tty = true; argIdx += 1
+                case "-m":        allCfg.MemoryLimit = os.Args[argIdx + 1]; argIdx += 2
+                case "-cpushare": allCfg.CpuShare = os.Args[argIdx + 1]; argIdx += 2
+                case "-cpuset":   allCfg.CpuSet = os.Args[argIdx + 1]; argIdx += 2
+                case "-it":       tty = true; argIdx += 1
                 default:          cmdArray = append(cmdArray, arg); argIdx += 1
             }
         }

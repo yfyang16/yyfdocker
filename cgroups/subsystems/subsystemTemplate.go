@@ -38,7 +38,7 @@ func SubsysTemplateSet(cgroupPath string, cfg *ResourceConfig, subsysName string
         }
     } 
 
-    log.Panicf("[%sMemorySubsystem:Set] GetCgroupPath throws error: %v", subsysName, err)
+    log.Panicf("[%sSubsystem:Set] GetCgroupPath throws error: %v", subsysName, err)
     return err
 }
 
