@@ -44,7 +44,7 @@ func RunContainerInitProcess() error {
     // e.g. /bin/bash is the absolute path of bash cmd
     absolutePath, err := exec.LookPath(cmdArray[0])
     if err != nil {
-        log.Panicf("[ReadUserCmd] Could not find the corresponding path of %s!", cmdArray[0])
+        log.Panicf("[ReadUserCmd] Could not find the corresponding path of %v!", cmdArray[0])
         return err
     }
 
