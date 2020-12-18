@@ -16,7 +16,7 @@ import (
  *     - command: argument of "yyfdocker init"
  */
 func Run(tty bool, cmdArray []string, cfg *subsystems.ResourceConfig) {
-    log.Printf("** Run START **\n")
+    log.Printf("** Run START (%v) **\n", cfg)
     defer log.Printf("** Run END **\n")
 
     parent, writePipe := container.NewParentProcess(tty)
@@ -39,5 +39,4 @@ func Run(tty bool, cmdArray []string, cfg *subsystems.ResourceConfig) {
     writePipe.Close()
 
     parent.Wait()
-    os.Exit(0)
 }

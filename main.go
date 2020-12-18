@@ -44,7 +44,7 @@ func main() {
                 default:          cmdArray = append(cmdArray, arg); argIdx += 1
             }
         }
-
+        
         Run(tty, cmdArray, allCfg)
 
     case "init":
