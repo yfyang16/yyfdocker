@@ -41,10 +41,10 @@ func main() {
                 case "-cpushare": allCfg.CpuShare = os.Args[argIdx + 1]; argIdx += 2
                 case "-cpuset":   allCfg.CpuSet = os.Args[argIdx + 1]; argIdx += 2
                 case "-it":       tty = true; argIdx += 1
-                default:          cmdArray = append(cmdArray, arg); argIdx += 1
+                default:          cmdArray = append(cmdArray, os.Args[argIdx:]...); break
             }
         }
-        
+
         Run(tty, cmdArray, allCfg)
 
     case "init":
