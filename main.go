@@ -37,9 +37,9 @@ func main() {
         for argIdx < len(os.Args)  {
             arg := os.Args[argIdx]
             switch arg {
-                case "-m":        allCfg.MemoryLimit = os.Args[3 + idx]; argIdx += 2
-                case "-cpushare": allCfg.CpuShare = os.Args[3 + idx]; argIdx += 2
-                case "-cpuset":   allCfg.CpuSet = os.Args[3 + idx]; argIdx += 2
+                case "-m":        allCfg.MemoryLimit = os.Args[3 + argIdx]; argIdx += 2
+                case "-cpushare": allCfg.CpuShare = os.Args[3 + argIdx]; argIdx += 2
+                case "-cpuset":   allCfg.CpuSet = os.Args[3 + argIdx]; argIdx += 2
                 case "-tty":      tty = true; argIdx += 1
                 default:          cmdArray = append(cmdArray, arg); argIdx += 1
             }
@@ -48,7 +48,7 @@ func main() {
         Run(tty, cmdArray, allCfg)
 
     case "init":
-        err := container.RunContainerInitProcess(os.Args[2], nil)
+        err := container.RunContainerInitProcess()
         if err != nil {
             log.Fatal("Error in Init Function")
             fmt.Printf("Error in Init Function\n")

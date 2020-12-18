@@ -6,6 +6,7 @@ import (
     "./container"
     "./cgroups"
     "./cgroups/subsystems"
+    "strings"
 )
 
 /* 
@@ -27,6 +28,11 @@ func Run(tty bool, cmdArray []string, cfg *subsystems.ResourceConfig) {
     if err := parent.Start(); err != nil {
         log.Panicln(err)
     }
+
+    cgroupManager := cgroups.NewCgroupManager("yyfdocker-cgroup")
+    defer cgroupManager.Destroy()
+    cgroupManager.Set(cfg)
+    cgroupManager.Apply(parent.Process.Pid)
 
     rawCommand := strings.Join(cmdArray, " ")
     writePipe.WriteString(rawCommand)
