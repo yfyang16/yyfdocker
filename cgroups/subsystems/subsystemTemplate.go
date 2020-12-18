@@ -31,6 +31,7 @@ func SubsysTemplateSet(cgroupPath string, cfg *ResourceConfig, subsysName string
 
             if subsysName == "cpuset" {
                 limitConfigFile0 := path.Join(subsysCgroupPath, "cpuset.mems")
+                log.Printf("[%sSubsystem:Set] limitConfigFile0: %v", limitConfigFile0)
                 err := ioutil.WriteFile(limitConfigFile0, []byte("0"), 0644)
                 if err != nil {
                     log.Panicf("[%sSubsystem:Set] Cannot write into file: %v", subsysName, err)
