@@ -9,10 +9,7 @@ import (
 )
 
 /* 
- * Run: yyfdocker run [args]
- *   para: 
- *     - tty: if connect the stdin, stdout, stderr between my process and the os
- *     - command: argument of "yyfdocker init"
+ * Run: yyfdocker run [cmd]
  */
 func Run(tty bool, cmdArray []string, cfg *subsystems.ResourceConfig) {
     log.Printf("** Run START (cfg: %v); (cmdArray: %v) **\n", cfg, cmdArray)

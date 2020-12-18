@@ -8,7 +8,7 @@ import (
     "./container"
 )
 
-const usage = "simple implementation by Yufeng Yang!"
+const usage = "yyfdocker run [-it] [-m val] [-cpushare val] [-cpuset val] [cmd]\n[simple implementation by Yufeng Yang]"
 
 func init() {
     logFileName := "YYFdocker.log"
