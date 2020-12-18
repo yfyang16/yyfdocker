@@ -3,7 +3,7 @@ package subsystems
 type MemorySubSystem struct {}
 
 func (sys *MemorySubSystem) Name() string {
-    return "cpuset"
+    return "memory"
 }
 
 func (sys *MemorySubSystem) Set(cgroupPath string, cfg *ResourceConfig) error {
