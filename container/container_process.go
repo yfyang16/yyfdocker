@@ -11,13 +11,18 @@ import (
  * NewParentProcess: fork an isolated process which will execute the "yyfdocker init"
  *   para: 
  *     - tty: if connect the stdin, stdout, stderr between my process and the os
- *     - command: argument of "yyfdocker init"
  */
-func NewParentProcess(tty bool, command string) *exec.Cmd {
+func NewParentProcess(tty bool) (*exec.Cmd, *os.File) {
     log.Printf("** NewParentProcess START **\n")
+    defer log.Printf("** NewParentProcess END **\n")
 
-    args := []string{"init", command}
-    cmd := exec.Command("/proc/self/exe", args...)
+    readPipe, writePipe, err := os.Pipe()
+    if err != nil {
+        log.Fatalf("[NewParentProcess] create anonymous pipe failure!")
+        return nil, nil
+    }
+
+    cmd := exec.Command("/proc/self/exe", "init")
 
     cmd.SysProcAttr = &syscall.SysProcAttr{
         Cloneflags: syscall.CLONE_NEWUTS | syscall.CLONE_NEWPID | syscall.CLONE_NEWNS |
@@ -29,6 +34,6 @@ func NewParentProcess(tty bool, command string) *exec.Cmd {
         cmd.Stderr = os.Stderr
 	}
 
-    log.Printf("** NewParentProcess END **\n")
-    return cmd
+    cmd.ExtraFiles = []*os.File{readPipe}    // extra file descriptor besides in, out and err
+    return cmd, writePipe
 }
