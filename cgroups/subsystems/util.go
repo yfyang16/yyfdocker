@@ -14,6 +14,7 @@ import (
  */
 func FindCgroupMountPoint(subsys string) string {
 	log.Printf("** FindCgroupMountPoint START **\n")
+    defer log.Printf("** FindCgroupMountPoint END **\n")
 
 	/** The mount information of the current process can be found in
 	 ** "/proc/self/mountinfo" file. The content of this file is like:
@@ -49,15 +50,20 @@ func FindCgroupMountPoint(subsys string) string {
 		return ""
 	}
 
-	log.Printf("** FindCgroupMountPoint END **\n")
 	return ""                                      // do not find the corresponding subsystem
 }
 
 /** Get the complete cgroup path */
 func GetCgroupPath(subsys string, cgroupPath string, autoCreate bool) (string, error) {
+    log.Printf("** GetCgroupPath START **\n")
+    defer log.Printf("** GetCgroupPath END **\n")
+
 	cgroupRoot := FindCgroupMountPoint(subsys)
 	completeCgroupPath := path.Join(cgroupRoot, cgroupPath)
 	_, err := os.Stat(completeCgroupPath)
+
+    log.Printf("[GetCgroupPath] autoCreate: %v; error: %v", autoCreate, err)
+
 	if err == nil || (autoCreate && os.IsNotExist(err)) {
 		if os.IsNotExist(err) {
 			err := os.Mkdir(completeCgroupPath, 0755)
