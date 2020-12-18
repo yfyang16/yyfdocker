@@ -62,7 +62,7 @@ func GetCgroupPath(subsys string, cgroupPath string, autoCreate bool) (string, e
 	completeCgroupPath := path.Join(cgroupRoot, cgroupPath)
 	_, err := os.Stat(completeCgroupPath)
 
-    log.Printf("[GetCgroupPath] autoCreate: %v; error: %v", autoCreate, err)
+    log.Printf("[GetCgroupPath] autoCreate: %v; error_bool: %v", autoCreate, os.IsNotExist(err))
 
 	if err == nil || (autoCreate && os.IsNotExist(err)) {
 		if os.IsNotExist(err) {
