@@ -26,19 +26,19 @@ func SubsysTemplateSet(cgroupPath string, cfg *ResourceConfig, subsysName string
 
     subsysCgroupPath, err := GetCgroupPath(subsysName, cgroupPath, true)
     if err == nil {
+
+        if subsysName == "cpuset" {
+            limitConfigFile0 := path.Join(subsysCgroupPath, "cpuset.mems")
+            log.Printf("[%sSubsystem:Set] limitConfigFile0: %v", limitConfigFile0)
+            err := ioutil.WriteFile(limitConfigFile0, []byte("0"), 0644)
+            if err != nil {
+                log.Panicf("[%sSubsystem:Set] Cannot write into file: %v", subsysName, err)
+                return fmt.Errorf("[%sSubsystem:Set] Cannot write into file: %v", subsysName, err)
+            }
+        }
+
         if valueLimited != "" {
             limitConfigFile := path.Join(subsysCgroupPath, fileName)
-
-            if subsysName == "cpuset" {
-                limitConfigFile0 := path.Join(subsysCgroupPath, "cpuset.mems")
-                log.Printf("[%sSubsystem:Set] limitConfigFile0: %v", limitConfigFile0)
-                err := ioutil.WriteFile(limitConfigFile0, []byte("0"), 0644)
-                if err != nil {
-                    log.Panicf("[%sSubsystem:Set] Cannot write into file: %v", subsysName, err)
-                    return fmt.Errorf("[%sSubsystem:Set] Cannot write into file: %v", subsysName, err)
-                }
-            }
-
             err := ioutil.WriteFile(limitConfigFile, []byte(valueLimited), 0644)
             if err != nil {
                 log.Panicf("[%sSubsystem:Set] Cannot write into file: %v", subsysName, err)
