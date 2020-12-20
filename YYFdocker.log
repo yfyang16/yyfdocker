@@ -1,0 +1,72 @@
+2020/12/21 13:23:11 main.go:28: ==**== YYFDOCKER START ==**== ([./yyfdocker commit busyboxImage])
+2020/12/21 13:23:11 main.go:63: ==== COMMIT START ====
+3:21:06 run.go:16: ** Run START (cfg: &{  }); (cmdArray: [sh]) **
+2020/12/21 13:21:06 container_process.go:18: ** NewParentProcess START **
+2020/12/21 13:21:06 container_process.go:45: ** NewParentProcess END **
+2020/12/21 13:21:06 subsystemTemplate.go:14: ** cpusetSubsystem:Set START **
+2020/12/21 13:21:06 util.go:58: ** GetCgroupPath START **
+2020/12/21 13:21:06 util.go:16: ** FindCgroupMountPoint START **
+2020/12/21 13:21:06 util.go:42: ** FindCgroupMountPoint END **
+2020/12/21 13:21:06 util.go:65: [GetCgroupPath] autoCreate: true; error_bool: true
+2020/12/21 13:21:06 util.go:75: ** GetCgroupPath END **
+2020/12/21 13:21:06 subsystemTemplate.go:32: [cpusetSubsystem:Set] limitConfigFile0: /sys/fs/cgroup/cpuset/yyfdocker-cgroup/cpuset.mems
+2020/12/21 13:21:06 subsystemTemplate.go:40: [cpusetSubsystem:Set] limitConfigFile1: /sys/fs/cgroup/cpuset/yyfdocker-cgroup/cpuset.cpus
+2020/12/21 13:21:06 subsystemTemplate.go:63: ** cpusetSubsystem:Set END **
+2020/12/21 13:21:06 subsystemTemplate.go:14: ** memorySubsystem:Set START **
+2020/12/21 13:21:06 util.go:58: ** GetCgroupPath START **
+2020/12/21 13:21:06 util.go:16: ** FindCgroupMountPoint START **
+2020/12/21 13:21:06 util.go:42: ** FindCgroupMountPoint END **
+2020/12/21 13:21:06 util.go:65: [GetCgroupPath] autoCreate: true; error_bool: true
+2020/12/21 13:21:06 util.go:75: ** GetCgroupPath END **
+2020/12/21 13:21:06 subsystemTemplate.go:63: ** memorySubsystem:Set END **
+2020/12/21 13:21:06 subsystemTemplate.go:14: ** cpuSubsystem:Set START **
+2020/12/21 13:21:06 util.go:58: ** GetCgroupPath START **
+2020/12/21 13:21:06 util.go:16: ** FindCgroupMountPoint START **
+2020/12/21 13:21:06 util.go:42: ** FindCgroupMountPoint END **
+2020/12/21 13:21:06 util.go:65: [GetCgroupPath] autoCreate: true; error_bool: true
+2020/12/21 13:21:06 util.go:75: ** GetCgroupPath END **
+2020/12/21 13:21:06 subsystemTemplate.go:63: ** cpuSubsystem:Set END **
+2020/12/21 13:21:06 subsystemTemplate.go:67: ** cpusetSubsystem:Apply START **
+2020/12/21 13:21:06 util.go:58: ** GetCgroupPath START **
+2020/12/21 13:21:06 util.go:16: ** FindCgroupMountPoint START **
+2020/12/21 13:21:06 util.go:42: ** FindCgroupMountPoint END **
+2020/12/21 13:21:06 util.go:65: [GetCgroupPath] autoCreate: false; error_bool: false
+2020/12/21 13:21:06 util.go:75: ** GetCgroupPath END **
+2020/12/21 13:21:06 subsystemTemplate.go:78: ** cpusetSubsystem:Apply END **
+2020/12/21 13:21:06 subsystemTemplate.go:67: ** memorySubsystem:Apply START **
+2020/12/21 13:21:06 util.go:58: ** GetCgroupPath START **
+2020/12/21 13:21:06 util.go:16: ** FindCgroupMountPoint START **
+2020/12/21 13:21:06 util.go:42: ** FindCgroupMountPoint END **
+2020/12/21 13:21:06 util.go:65: [GetCgroupPath] autoCreate: false; error_bool: false
+2020/12/21 13:21:06 util.go:75: ** GetCgroupPath END **
+2020/12/21 13:21:06 subsystemTemplate.go:78: ** memorySubsystem:Apply END **
+2020/12/21 13:21:06 subsystemTemplate.go:67: ** cpuSubsystem:Apply START **
+2020/12/21 13:21:06 util.go:58: ** GetCgroupPath START **
+2020/12/21 13:21:06 util.go:16: ** FindCgroupMountPoint START **
+2020/12/21 13:21:06 util.go:42: ** FindCgroupMountPoint END **
+2020/12/21 13:21:06 util.go:65: [GetCgroupPath] autoCreate: false; error_bool: false
+2020/12/21 13:21:06 util.go:75: ** GetCgroupPath END **
+2020/12/21 13:21:06 subsystemTemplate.go:78: ** cpuSubsystem:Apply END **
+2020/12/21 13:16:29 container_process.go:137: [DeleteMountPoint] remove files failed: remove /root/mnt: device or resource busy
+2020/12/21 13:16:29 subsystemTemplate.go:87: ** cpusetSubsystem:Remove START **
+2020/12/21 13:16:29 util.go:58: ** GetCgroupPath START **
+2020/12/21 13:16:29 util.go:16: ** FindCgroupMountPoint START **
+2020/12/21 13:16:29 util.go:42: ** FindCgroupMountPoint END **
+2020/12/21 13:16:29 util.go:65: [GetCgroupPath] autoCreate: false; error_bool: false
+2020/12/21 13:16:29 util.go:75: ** GetCgroupPath END **
+2020/12/21 13:16:29 subsystemTemplate.go:92: ** cpusetSubsystem:Remove END **
+2020/12/21 13:16:29 subsystemTemplate.go:87: ** memorySubsystem:Remove START **
+2020/12/21 13:16:29 util.go:58: ** GetCgroupPath START **
+2020/12/21 13:16:29 util.go:16: ** FindCgroupMountPoint START **
+2020/12/21 13:16:29 util.go:42: ** FindCgroupMountPoint END **
+2020/12/21 13:16:29 util.go:65: [GetCgroupPath] autoCreate: false; error_bool: false
+2020/12/21 13:16:29 util.go:75: ** GetCgroupPath END **
+2020/12/21 13:16:29 subsystemTemplate.go:92: ** memorySubsystem:Remove END **
+2020/12/21 13:16:29 subsystemTemplate.go:87: ** cpuSubsystem:Remove START **
+2020/12/21 13:16:29 util.go:58: ** GetCgroupPath START **
+2020/12/21 13:16:29 util.go:16: ** FindCgroupMountPoint START **
+2020/12/21 13:16:29 util.go:42: ** FindCgroupMountPoint END **
+2020/12/21 13:16:29 util.go:65: [GetCgroupPath] autoCreate: false; error_bool: false
+2020/12/21 13:16:29 util.go:75: ** GetCgroupPath END **
+2020/12/21 13:16:29 subsystemTemplate.go:92: ** cpuSubsystem:Remove END **
+2020/12/21 13:16:29 asm_amd64.s:574: ** Run END **

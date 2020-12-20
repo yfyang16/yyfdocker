@@ -12,7 +12,7 @@ const usage = "yyfdocker run [-it] [-m val] [-cpushare val] [-cpuset val] [cmd]\
 
 func init() {
     logFileName := "YYFdocker.log"
-    logFile, logErr := os.OpenFile(logFileName, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+    logFile, logErr := os.OpenFile(logFileName, os.O_CREATE|os.O_WRONLY, 0666)
     if logErr != nil {
         log.Fatalf("logFile open fail: %v", logErr)
     }
@@ -25,13 +25,16 @@ func main() {
         log.Fatal("YYFdocker needs a command")
     }
 
+    log.Printf("==**== YYFDOCKER START ==**== (%v)\n", os.Args)
+
     switch os.Args[1] {
     case "run":
-        log.Printf("==== MAIN FUNCTION START TO RUN ====\n")
+        log.Printf("==== RUN START ====\n")
 
         tty := false
         allCfg := &subsystems.ResourceConfig{}
         var cmdArray []string
+        var volume string
 
         argIdx := 2
         for argIdx < len(os.Args)  {
@@ -40,19 +43,25 @@ func main() {
                 case "-m":        allCfg.MemoryLimit = os.Args[argIdx + 1]; argIdx += 2
                 case "-cpushare": allCfg.CpuShare = os.Args[argIdx + 1]; argIdx += 2
                 case "-cpuset":   allCfg.CpuSet = os.Args[argIdx + 1]; argIdx += 2
+                case "-v":        volume = os.Args[argIdx + 1]; argIdx += 2
                 case "-it":       tty = true; argIdx += 1
-                default:          cmdArray = append(cmdArray, os.Args[argIdx:]...); break
+                default:          cmdArray = append(cmdArray, os.Args[argIdx:]...); argIdx = len(os.Args)
             }
         }
 
-        Run(tty, cmdArray, allCfg)
+        Run(tty, cmdArray, allCfg, volume)
 
     case "init":
+        log.Printf("==== INIT START ====\n")
         err := container.RunContainerInitProcess()
         if err != nil {
             log.Fatal("Error in Init Function")
             fmt.Printf("Error in Init Function\n")
         }
+
+    case "commit":
+        log.Printf("==== COMMIT START ====\n")
+        CommitContainer(os.Args[2])
 
     case "--usage":
         fmt.Printf("Usage: %s", usage)

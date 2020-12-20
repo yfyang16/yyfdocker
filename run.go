@@ -6,16 +6,17 @@ import (
     "./cgroups"
     "./cgroups/subsystems"
     "strings"
+    "os"
 )
 
 /* 
  * Run: yyfdocker run [cmd]
  */
-func Run(tty bool, cmdArray []string, cfg *subsystems.ResourceConfig) {
+func Run(tty bool, cmdArray []string, cfg *subsystems.ResourceConfig, volume string) {
     log.Printf("** Run START (cfg: %v); (cmdArray: %v) **\n", cfg, cmdArray)
     defer log.Printf("** Run END **\n")
 
-    parent, writePipe := container.NewParentProcess(tty)
+    parent, writePipe := container.NewParentProcess(tty, volume)
     if parent == nil {
         log.Panicf("[Run] Maybe anonymous pipe creation failure!")
         return
@@ -35,4 +36,7 @@ func Run(tty bool, cmdArray []string, cfg *subsystems.ResourceConfig) {
     writePipe.Close()
 
     parent.Wait()
+
+    container.DeleteWorkSpace("/root", "/root/mnt", volume)
+    os.Exit(0)
 }
