@@ -12,7 +12,7 @@ const usage = "yyfdocker run [-it] [-m val] [-cpushare val] [-cpuset val] [cmd]\
 
 func init() {
     logFileName := "YYFdocker.log"
-    logFile, logErr := os.OpenFile(logFileName, os.O_CREATE|os.O_WRONLY, 0666)
+    logFile, logErr := os.OpenFile(logFileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
     if logErr != nil {
         log.Fatalf("logFile open fail: %v", logErr)
     }
@@ -32,7 +32,9 @@ func main() {
         log.Printf("==== RUN START ====\n")
 
         tty := false
+        detach := false
         allCfg := &subsystems.ResourceConfig{}
+        containerName := ""
         var cmdArray []string
         var volume string
 
@@ -45,11 +47,19 @@ func main() {
                 case "-cpuset":   allCfg.CpuSet = os.Args[argIdx + 1]; argIdx += 2
                 case "-v":        volume = os.Args[argIdx + 1]; argIdx += 2
                 case "-it":       tty = true; argIdx += 1
+                case "-d":        detach = true; argIdx += 1
+                case "--name":    containerName = os.Args[argIdx + 1]; argIdx += 2
                 default:          cmdArray = append(cmdArray, os.Args[argIdx:]...); argIdx = len(os.Args)
             }
         }
+        imageName := cmdArray[0]
+        cmdArray = cmdArray[1:]
 
-        Run(tty, cmdArray, allCfg, volume)
+        if tty && detach {
+            log.Panicf("[RUN CMD] -d and -it parameters cannot be existed at the same time.")
+        }
+
+        Run(tty, cmdArray, allCfg, volume, containerName, imageName)
 
     case "init":
         log.Printf("==== INIT START ====\n")
@@ -61,7 +71,36 @@ func main() {
 
     case "commit":
         log.Printf("==== COMMIT START ====\n")
-        CommitContainer(os.Args[2])
+        CommitContainer(os.Args[2], os.Args[3])
+
+    case "logs":
+        log.Printf("==== LOGS START ====\n")
+        LogContainer(os.Args[2])
+
+    case "ps":
+        log.Printf("==== PS START ====\n")
+        ListContainers()
+
+    case "stop":
+        log.Printf("==== STOP START ====\n")
+        StopContainer(os.Args[2])
+
+    case "rm":
+        log.Printf("==== RM START ====\n")
+        RemoveContainer(os.Args[2])
+
+    case "exec":
+        log.Printf("==== EXEC START ====\n")
+
+        if os.Getenv(ENV_EXEC_PID) != "" {
+            log.Printf("[EXEC CMD] callback"); return
+        }
+
+        var cmdArray []string
+        for _, cmd := range os.Args[3:] {
+            cmdArray = append(cmdArray, cmd)
+        }
+        ExecContainer(os.Args[2], cmdArray)
 
     case "--usage":
         fmt.Printf("Usage: %s", usage)

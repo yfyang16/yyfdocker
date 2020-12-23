@@ -7,14 +7,38 @@ import (
     "log"
     "path"
     "strings"
+    "fmt"
 )
+
+var (
+    RUNNING string             = "running"
+    STOP string                = "stopped"
+    EXIT string                = "exited"
+    DefaultInfoLocation string = "/var/run/yyfdocker/%s/"
+    ConfigName string          = "config.txt"
+    ContainerLog string        = "container.log"
+    RootPath string            = "/root"
+    MntPath string             = "/root/mnt"
+    WriteLayerPath string      = "/root/writeLayer"
+)
+
+type ContainerInfo struct {
+    Pid         string
+    Id          string
+    Name        string
+    Command     string
+    CreatedTime string
+    Status      string
+    Volume      string
+}
+
 
 /** 
  * NewParentProcess: fork an isolated process which will execute the "yyfdocker init"
  * @para tty: if connect the stdin, stdout, stderr between my process and the os
  * @para volume: the path of host directory which will be mapped to /root/mnt
  */
-func NewParentProcess(tty bool, volume string) (*exec.Cmd, *os.File) {
+func NewParentProcess(tty bool, volume string, containerName string, imageName string) (*exec.Cmd, *os.File) {
     log.Printf("** NewParentProcess START **\n")
     defer log.Printf("** NewParentProcess END **\n")
 
@@ -30,31 +54,43 @@ func NewParentProcess(tty bool, volume string) (*exec.Cmd, *os.File) {
         Cloneflags: syscall.CLONE_NEWUTS | syscall.CLONE_NEWPID | syscall.CLONE_NEWNS |
         syscall.CLONE_NEWNET | syscall.CLONE_NEWIPC,
     }
-    if tty {
+    if tty {                                 // -it
         cmd.Stdin = os.Stdin
         cmd.Stdout = os.Stdout
         cmd.Stderr = os.Stderr
-	}
+	} else {
+        logDirPath := fmt.Sprintf(DefaultInfoLocation, containerName)
+        if err = os.MkdirAll(logDirPath, 0622); err != nil {
+            log.Panicf("[NewParentProcess] make all directories failed: %v", err)
+            return nil, nil
+        }
+        logFilePath := path.Join(logDirPath, ContainerLog)
+        logFile, err := os.Create(logFilePath)
+        if err != nil {
+            log.Panicf("[NewParentProcess] create log file error: %v", err)
+            return nil, nil
+        }
+        cmd.Stdout = logFile
+    }
 
     cmd.ExtraFiles = []*os.File{readPipe}    // extra file descriptor besides in, out and err
 
-    rootPath := "/root"; mntPath := "/root/mnt"
-    NewWorkSpace(rootPath, mntPath, volume)
-    cmd.Dir = mntPath
+    NewWorkSpace(volume, imageName, containerName)
+    cmd.Dir = path.Join(MntPath, containerName)
 
     return cmd, writePipe
 }
 
 
 /** Create an AUFS filesystem as a container root workspace */
-func NewWorkSpace(rootPath string, mntPath string, volume string) {
-    CreateReadOnlyLayer(rootPath, "busybox")
-    CreateWriteOnlyLayer(rootPath)
-    CreateMountPoint(rootPath, mntPath)
+func NewWorkSpace(volume string, imageName string, containerName string) {
+    CreateReadOnlyLayer(imageName)
+    CreateWriteOnlyLayer(containerName)
+    CreateMountPoint(containerName, imageName)
     if volume != "" {
         volumePaths := strings.Split(volume, ":")
         if len(volumePaths) == 2 && volumePaths[0] != "" && volumePaths[1] != "" {
-            MountVolume(rootPath, mntPath, volumePaths)
+            MountVolume(volumePaths, containerName)
         } else {
             log.Panicf("[NewWorkSpace] volume parameter is incorrect: %s", volume)
         }
@@ -63,12 +99,12 @@ func NewWorkSpace(rootPath string, mntPath string, volume string) {
 }
 
 
-func CreateReadOnlyLayer(rootPath string, imageName string) {
-    imagePath := path.Join(rootPath, imageName)
-    imageTarPath := path.Join(rootPath, imageName + ".tar")
+func CreateReadOnlyLayer(imageName string) {
+    imagePath := path.Join(RootPath, imageName)
+    imageTarPath := path.Join(RootPath, imageName + ".tar")
 
     if _, err := os.Stat(imagePath); os.IsNotExist(err) {
-        err := os.Mkdir(imagePath, 0777)
+        err := os.MkdirAll(imagePath, 0777)
         if err != nil {
             log.Panicf("[CreateReadOnlyLayer] make directory failed: %v", err)
         }
@@ -80,33 +116,35 @@ func CreateReadOnlyLayer(rootPath string, imageName string) {
     }
 }
 
-func CreateWriteOnlyLayer(rootPath string) {
-    if err := os.Mkdir(path.Join(rootPath, "writeLayer"), 0777); err != nil {
-        log.Panicf("[CreateWriteOnlyLayer] make directory failed: %v", err)
+func CreateWriteOnlyLayer(containerName string) {
+    if err := os.MkdirAll(path.Join(WriteLayerPath, containerName), 0777); err != nil {
+        log.Printf("[CreateWriteOnlyLayer] make directory failed: %v", err)
     }
 }
 
-func CreateMountPoint(rootPath string, mntPath string) {
-    if err := os.Mkdir(mntPath, 0777); err != nil {
-        log.Panicf("[CreateMountPoint] make directory failed: %v", err)
+func CreateMountPoint(containerName string, imageName string) {
+    if err := os.MkdirAll(path.Join(MntPath, containerName), 0777); err != nil {
+        log.Printf("[CreateMountPoint] make directory failed: %v", err)
     }
 
     // mount -t aufs -o dirs=/root/writeLayer:/root/busy/box none /root/mnt
-    dirs := "dirs="+path.Join(rootPath, "writeLayer")+":"+path.Join(rootPath, "busybox")
-    if  _, err := exec.Command("mount", "-t", "aufs", "-o", dirs, "none", mntPath).CombinedOutput(); err != nil {
+    containerMntPath := path.Join(MntPath, containerName)
+    imagePath := path.Join(RootPath, imageName)
+    dirs := "dirs=" + path.Join(WriteLayerPath, containerName) + ":" + imagePath
+    if  _, err := exec.Command("mount", "-t", "aufs", "-o", dirs, "none", containerMntPath).CombinedOutput(); err != nil {
         log.Panicf("[CreateMountPoint] mount cmd failed: %v", err)
     }
 }
 
-func MountVolume(rootPath string, mntPath string, volumePaths []string) {
+func MountVolume(volumePaths []string, containerName string) {
     hostPath := volumePaths[0]; containerPath := volumePaths[1]
 
-    containerVolumePath := path.Join(mntPath, containerPath)
+    containerVolumePath := path.Join(path.Join(MntPath, containerName), containerPath)
     if err1 := os.Mkdir(hostPath, 0777);  err1 != nil {
-        log.Panicf("[MountVolume] make directory failed: %v", err1)
+        log.Printf("[MountVolume] make directory failed: %v", err1)
     }
     if err2 := os.Mkdir(containerVolumePath, 0777); err2 != nil {
-        log.Panicf("[MountVolume] make directory failed: %v", err2)
+        log.Printf("[MountVolume] make directory failed: %v", err2)
     }
 
     _, err := exec.Command("mount", "-t", "aufs", "-o", "dirs="+hostPath, "none", containerVolumePath).CombinedOutput()
@@ -115,38 +153,39 @@ func MountVolume(rootPath string, mntPath string, volumePaths []string) {
     }
 }
 
-func DeleteWorkSpace(rootPath string, mntPath string, volume string) {
+func DeleteWorkSpace(volume string, containerName string) {
     if volume != "" {
         volumePaths := strings.Split(volume, ":")
         if len(volumePaths) == 2 && volumePaths[0] != "" && volumePaths[1] != "" {
-            DeleteMountPointWithVolume(rootPath, mntPath, volumePaths)
+            DeleteMountPointWithVolume(volumePaths, containerName)
         } else {
-            DeleteMountPoint(rootPath, mntPath)
+            DeleteMountPoint(containerName)
         }
     } else {
-        DeleteMountPoint(rootPath, mntPath)
+        DeleteMountPoint(containerName)
     }
-    DeleteWriteLayer(rootPath)
+    DeleteWriteLayer(containerName)
 }
 
-func DeleteMountPoint(rootPath string, mntPath string) {
-    if _, err := exec.Command("umount", mntPath).CombinedOutput(); err != nil {
+func DeleteMountPoint(containerName string) {
+    if _, err := exec.Command("umount", "-l", path.Join(MntPath, containerName)).CombinedOutput(); err != nil {
         log.Panicf("[DeleteMountPoint] umount failed: %v", err)
     }
-    if err := os.RemoveAll(mntPath); err != nil {
+    if err := os.RemoveAll(path.Join(MntPath, containerName)); err != nil {
         log.Panicf("[DeleteMountPoint] remove files failed: %v", err)
     }
 }
 
-func DeleteMountPointWithVolume(rootPath string, mntPath string, volumePaths []string) {
-    if _, err := exec.Command("umount", path.Join(mntPath, volumePaths[1])).CombinedOutput(); err != nil {
-        log.Panicf("[DeleteMountPointWithVolume] umount failed: %v", err)
+func DeleteMountPointWithVolume(volumePaths []string, containerName string) {
+    containerMntPath := path.Join(MntPath, containerName)
+    if _, err := exec.Command("umount", "-l", path.Join(containerMntPath, volumePaths[1])).CombinedOutput(); err != nil {
+        log.Printf("[DeleteMountPointWithVolume] umount failed: %v", err)
     }
-    DeleteMountPoint(rootPath, mntPath)
+    DeleteMountPoint(containerName)
 }
 
-func DeleteWriteLayer(rootPath string) {
-    if err := os.RemoveAll(path.Join(rootPath, "writeLayer")); err != nil {
+func DeleteWriteLayer(containerName string) {
+    if err := os.RemoveAll(path.Join(WriteLayerPath, containerName)); err != nil {
         log.Panicf("[DeleteWriteLayer] remove files failed: %v", err)
     }
 }

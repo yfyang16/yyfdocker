@@ -19,7 +19,8 @@ func RunContainerInitProcess() error {
     log.Printf("** RunContainerInitProcess START **\n")
 
     // wait and read user cmds from the read pipe
-    cmdArray := ReadUserCmd() 
+    cmdArray := ReadUserCmd()
+    fmt.Printf("[RunContainerInitProcess] receive cmd: %v\n", cmdArray)
     if cmdArray == nil {
         log.Panicf("[RunContainerInitProcess] Could not read pipe!")
         return fmt.Errorf("[RunContainerInitProcess] Could not read pipe!")
@@ -35,7 +36,7 @@ func RunContainerInitProcess() error {
     // e.g. /bin/bash is the absolute path of bash cmd
     absolutePath, err := exec.LookPath(cmdArray[0])
     if err != nil {
-        log.Panicf("[RunContainerInitProcess] Could not find the corresponding path of %v!", cmdArray[0])
+        log.Panicf("[RunContainerInitProcess] Could not find the corresponding path of %v!(%v)", cmdArray[0], err)
         return err
     }
 
@@ -45,7 +46,8 @@ func RunContainerInitProcess() error {
     // "command" process. (So the first process (pid == 1) will be "command")
     err = syscall.Exec(absolutePath, cmdArray[0:], os.Environ())
     if err != nil {
-        log.Printf(err.Error())
+        fmt.Printf("[RunContainerInitProcess] exec cmd %v error: %v\n", absolutePath, err)
+        log.Printf("[RunContainerInitProcess] exec cmd %v error: %v\n", absolutePath, err)
     }
 
     return err
@@ -67,6 +69,7 @@ func ReadUserCmd() []string {
 /** Pivot root ,and mount proc and tmpfs*/
 func SetUpMount() error {
     pwd, err := os.Getwd()
+    fmt.Printf("[SetUpMount] pwd is: %v\n", pwd)
     if err != nil {
         log.Panicf("[SetUpMount] Get workin directory failed: %v", err)
         return fmt.Errorf("[SetUpMount] Get workin directory failed: %v", err)

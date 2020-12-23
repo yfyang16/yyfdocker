@@ -91,7 +91,7 @@ func SubsysTemplateRemove(cgroupPath string, subsysName string) error {
     if err == nil {
         return os.RemoveAll(subsysCgroupPath)
     } else {
-        log.Panicf("[%sSubsystem:Remove] GetCgroupPath throws error: %v", subsysName, err)
+        log.Printf("[%sSubsystem:Remove] GetCgroupPath throws error: %v", subsysName, err)
         return fmt.Errorf("[%sSubsystem:Remove] GetCgroupPath throws error: %v", subsysName, err)
     }
 

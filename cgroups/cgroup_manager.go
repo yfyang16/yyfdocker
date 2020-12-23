@@ -34,7 +34,7 @@ func (c *CgroupManager) Set(res *subsystems.ResourceConfig) error {
 func (c *CgroupManager) Destroy() error {
     for _, subSysIns := range(subsystems.SubsystemsIns) {
         if err := subSysIns.Remove(c.Path); err != nil {
-            log.Panicf("[CgroupManager] remove cgroup fail %v", err)
+            log.Printf("[CgroupManager] remove cgroup fail %v", err)
         }
     }
     return nil
