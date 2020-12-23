@@ -1,13 +1,20 @@
 ## yyfdocker
 
-A simple implementation of docker
+A very simple implementation of docker
 
-### Run
+### Usage
 
 ```
 cd yyfdocker
 go build .
-./yyfdocker run -it /bin/bash
+
+./yyfdocker run [-it/-d] [-m {v}] [-cpushare {v}] [-cpuset {v}] [-v {host path}:{container path}] [--name {containerName}] {imageName} {commands}
+./yyfdocker commit {containerName} {imageName}
+./yyfdocker ps
+./yyfdocker logs {containerName}
+./yyfdocker stop {containerName}
+./yyfdocker rm {containerName}
+./yyfdcoker exec {containerName} {commands}
 ```
 
 ### Log file

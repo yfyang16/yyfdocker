@@ -37,7 +37,6 @@ func Run(tty bool, cmdArray []string, cfg *subsystems.ResourceConfig, volume str
     }
 
     cgroupManager := cgroups.NewCgroupManager("yyfdocker-cgroup")
-    // defer cgroupManager.Destroy()
     cgroupManager.Set(cfg)
     cgroupManager.Apply(parent.Process.Pid)
 

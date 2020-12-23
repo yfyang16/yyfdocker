@@ -8,7 +8,19 @@ import (
     "./container"
 )
 
-const usage = "yyfdocker run [-it] [-m val] [-cpushare val] [-cpuset val] [cmd]\n[simple implementation by Yufeng Yang]"
+const usage =
+
+"Commands:\n
+    run [-it/-d] [-v {host}:{container}] [-m {v}] [-cpushare {v}] [-cpuset {v}] [--name {container name}] {image name} {commands}\n
+    ps\n
+    images\n
+    logs {container name}\n
+    stop {container name}\n
+    rm {stopped container name}\n
+    exec {container name} {commands}\n
+    commit {container name} {image name}\n
+"
+
 
 func init() {
     logFileName := "YYFdocker.log"
@@ -81,6 +93,10 @@ func main() {
         log.Printf("==== PS START ====\n")
         ListContainers()
 
+    case "images":
+        log.Printf("==== IMAGES START ====\n")
+        ListImages()
+
     case "stop":
         log.Printf("==== STOP START ====\n")
         StopContainer(os.Args[2])
@@ -103,7 +119,10 @@ func main() {
         ExecContainer(os.Args[2], cmdArray)
 
     case "--usage":
-        fmt.Printf("Usage: %s", usage)
+        fmt.Printf("Usage: yyfdocker COMMAND\n\n%s", usage)
+
+    case "-v":
+        fmt.Printf("yyfdocker v0.5")
 
     default:
         log.Fatal("Wrong arguments")

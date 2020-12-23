@@ -8,6 +8,7 @@ import (
 	"text/tabwriter"
 	"log"
 	"path"
+	"strconv"
 )
 
 func ListContainers() {
@@ -35,6 +36,25 @@ func ListContainers() {
 	}
 	if err := w.Flush(); err != nil {
 		log.Panicf("[ListContainers] Flush error %v", err)
+		return
+	}
+}
+
+func ListImages() {
+	w := tabwriter.NewWriter(os.Stdout, 15, 0, 1, ' ', 0)
+	fmt.Fprint(w, "REPOSITORY\tTAG\tIMAGE ID\tCREATED\tSIZE\t\n")
+
+	possibleImageTars := ioutil.ReadDir(container.RootPath)
+	for _, e := range possibleImageTars {
+		if !e.IsDir() {
+			name := strings.Split(e.Name(), ".")[0]
+			created := e.ModTime().Format("15:04 2006/01/02")
+			sz := strconv.Itoa(e.Size()/1024/1024) + "MB"
+			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t\n", name, "latest", " ", created, sz)
+		}
+	}
+	if err := w.Flush(); err != nil {
+		log.Panicf("[ListImages] Flush error %v", err)
 		return
 	}
 }
