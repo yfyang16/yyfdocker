@@ -8,18 +8,16 @@ import (
     "./container"
 )
 
-const usage =
-
-"Commands:\n
-    run [-it/-d] [-v {host}:{container}] [-m {v}] [-cpushare {v}] [-cpuset {v}] [--name {container name}] {image name} {commands}\n
-    ps\n
-    images\n
-    logs {container name}\n
-    stop {container name}\n
-    rm {stopped container name}\n
-    exec {container name} {commands}\n
-    commit {container name} {image name}\n
-"
+const usage = `Commands:
+    run [-it/-d] [-v {host}:{container}] [-m {v}] [-cpushare {v}] [-cpuset {v}] [--name {container name}] {image name} {commands}
+    ps
+    images
+    logs   {container name}
+    stop   {container name}
+    rm     {stopped container name}
+    exec   {container name} {commands}
+    commit {container name} {image name}
+`
 
 
 func init() {
@@ -119,7 +117,7 @@ func main() {
         ExecContainer(os.Args[2], cmdArray)
 
     case "--usage":
-        fmt.Printf("Usage: yyfdocker COMMAND\n\n%s", usage)
+        fmt.Printf("Simple Implementation of docker By Yufeng Yang\nUsage: yyfdocker COMMAND\n\n%s", usage)
 
     case "-v":
         fmt.Printf("yyfdocker v0.5")

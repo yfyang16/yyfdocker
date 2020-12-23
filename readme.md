@@ -11,6 +11,7 @@ go build .
 ./yyfdocker run [-it/-d] [-m {v}] [-cpushare {v}] [-cpuset {v}] [-v {host path}:{container path}] [--name {containerName}] {imageName} {commands}
 ./yyfdocker commit {containerName} {imageName}
 ./yyfdocker ps
+./yyfdocker images
 ./yyfdocker logs {containerName}
 ./yyfdocker stop {containerName}
 ./yyfdocker rm {containerName}
